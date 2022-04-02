@@ -23,7 +23,13 @@ messageid = {}
 
 
 def help(bot, update):
-    update.message.reply_text('/notifi <symbol> <price>')
+    update.message.reply_text('/help                        # show help\n' +
+                              '/showjobs                    # show all jobs\n' +
+                              '/clearjobs                   # clear all jobs\n' +
+                              '/clearnotifis                # clear all notifi jobs\n' +
+                              '/clearsetorders              # clear all setorder jobs\n' +
+                              '/removejob <job uuid>        # remove job by job uuid\n' +
+                              '/notifi <symbol> <price>     # setup a new notifi job\n')
 
 def showjobs(bot, update):
     update.message.reply_text('```\n' + json.dumps(jobs, indent=2) + '\n```', parse_mode='Markdown')
@@ -53,17 +59,20 @@ def clearsetorders(bot, update):
 
 def removejob(bot, update, args):
     lock.acquire()
-    uuid = str(args[0])
-    for job in alljobs:
-        allsymbols=list(jobs[job].keys())
-        for symbol in allsymbols:
-            if jobs[job][symbol].has_key(uuid):
-                del jobs[job][symbol][uuid]
+    try:
+        uuid = str(args[0])
+        alljobs = list(jobs.keys())
+        for job in alljobs:
+            allsymbols=list(jobs[job].keys())
+            for symbol in allsymbols:
+                if jobs[job][symbol].__contains__(uuid):
+                    del jobs[job][symbol][uuid]
 
-    del messageid[uuid]
+        del messageid[uuid]
+        update.message.reply_text('remove job `' + uuid + '` success', parse_mode='Markdown')
+    except:
+        update.message.reply_text('bad args...')
     lock.release()
-    update.message.reply_text('remove job success')
-    pass
 
 def notifi(bot, update, args):
     locked = False
@@ -81,8 +90,8 @@ def notifi(bot, update, args):
             jobs['notifi'][symbol] = {}
         nowuuid = str(uuid.uuid4())
         messageid[nowuuid] = update.message
-        jobs['notifi'][symbol][nowuuid]({'price':price,'larger':larger})
-        update.message.reply_text('setup success, job uuid is: ' + nowuuid + ', notifi price is: ' + str(price) + ', now price is: ' + str(nowprice))
+        jobs['notifi'][symbol][nowuuid] = {'price':price,'larger':larger}
+        update.message.reply_text('setup success, job uuid is: `' + nowuuid + '`, notifi price is: ' + str(price) + ', now price is: ' + str(nowprice), parse_mode='Markdown')
         lock.release()
         locked = False
     except:
