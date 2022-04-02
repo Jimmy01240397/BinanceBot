@@ -1,0 +1,11 @@
+[Unit]
+Description=Start Binance Bot
+After=network.target
+
+[Service]
+WorkingDirectory=/etc/binancebot
+ExecStart=/etc/binancebot/binancebot.sh
+
+
+[Install]
+WantedBy=multi-user.target

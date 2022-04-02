@@ -1,0 +1,4 @@
+BinanceApiKey: '<BinanceApiKey>'
+BinanceApiSecret: '<BinanceApiSecret>'
+TelegramBotApi: '<TelegramBotApi>'
+TelegramUserId: '<TelegramUserId>'
